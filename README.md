@@ -23,7 +23,7 @@ The service uses three entities:
     -   `recipient_id`: Foreign Key to Recipient
     -   `special_offer_id`: Foreign Key to SpecialOffer
 
-## API Documentation and Postman Guide
+## API Documentation
 
 This guide provides detailed instructions on how to test the various endpoints of the service using Postman.
 
