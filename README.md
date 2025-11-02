@@ -94,7 +94,7 @@ This guide provides detailed instructions on how to test the various endpoints o
 
 *   **Purpose:** To retrieve all redeemed vouchers associated with a specific special offer.
 *   **Method:** `GET`
-*   **URL:** `http://localhost:8080/vouchers/offer/Summer%20Sale`
+*   **URL:** `http://localhost:8080/vouchers/offer/Summer Sale`
 *   **Optional Query Parameters (for pagination):**
     *   `page`: `0`
     *   `size`: `10`
