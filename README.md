@@ -23,69 +23,80 @@ The service uses three entities:
     -   `recipient_id`: Foreign Key to Recipient
     -   `special_offer_id`: Foreign Key to SpecialOffer
 
-## API Documentation
+## API Documentation and Postman Guide
 
-The API is documented using OpenAPI (Swagger). You can access the Swagger UI at `http://localhost:8080/swagger-ui.html`.
+This guide provides detailed instructions on how to test the various endpoints of the service using Postman.
 
-### Endpoints
+### Step 1: Create a Special Offer
 
--   **`POST /vouchers/generate`**: Generates voucher codes for all recipients for a given special offer.
-    -   Request Parameters:
-        -   `specialOfferName`: String
-        -   `expirationDate`: LocalDate (format: `yyyy-MM-dd`)
--   **`POST /vouchers/redeem`**: Redeems a voucher code.
-    -   Request Parameters:
-        -   `code`: String
-        -   `email`: String
--   **`GET /vouchers/recipient/{email}`**: Retrieves a paginated list of valid voucher codes for a given recipient.
-    -   Path Variable:
-        -   `email`: String
-    -   Pagination Parameters:
-        -   `page`: int (default: 0)
-        -   `size`: int (default: 20)
-        -   `sort`: string (e.g., `expirationDate,desc`)
--   **`GET /vouchers/offer/{offerName}`**: Retrieves a paginated list of redeemed voucher codes for a given special offer.
-    -   Path Variable:
-        -   `offerName`: String
-    -   Pagination Parameters:
-        -   `page`: int (default: 0)
-        -   `size`: int (default: 20)
-        -   `sort`: string (e.g., `redeemedAt,desc`)
-
-## How to Run the Project
-
-1.  **Prerequisites**:
-    -   Java 21
-    -   Maven
-    -   PostgreSQL
-2.  **Database Setup**:
-    -   Create a PostgreSQL database named `voucher_db`.
-    -   Update the `spring.datasource.username` and `spring.datasource.password` in `src/main/resources/application.properties` if necessary.
-3.  **Run the application**:
-    ```bash
-    mvn spring-boot:run
+*   **Purpose:** To add a new special offer to the system.
+*   **Method:** `POST`
+*   **URL:** `http://localhost:8080/special-offers`
+*   **Headers:**
+    *   `Content-Type`: `application/json`
+*   **Body (raw, JSON):**
+    ```json
+    {
+        "name": "Summer Sale",
+        "discountPercentage": 25
+    }
     ```
+*   **Expected Response:** `200 OK` with the created `SpecialOffer` object in the response body, including its generated `id`.
 
-## Example Postman Requests
+### Step 2: Create a Recipient
 
-### Generate Vouchers
+*   **Purpose:** To add a new recipient to the system.
+*   **Method:** `POST`
+*   **URL:** `http://localhost:8080/recipients`
+*   **Headers:**
+    *   `Content-Type`: `application/json`
+*   **Body (raw, JSON):**
+    ```json
+    {
+        "name": "John Doe",
+        "email": "john.doe@example.com"
+    }
+    ```
+*   **Expected Response:** `200 OK` with the created `Recipient` object in the response body, including its generated `id`.
 
--   **URL**: `POST http://localhost:8080/vouchers/generate`
--   **Body** (form-data):
-    -   `specialOfferName`: `Black Friday Offer`
-    -   `expirationDate`: `2025-12-31`
+### Step 3: Generate Vouchers
 
-### Redeem Voucher
+*   **Purpose:** To generate voucher codes for all existing recipients based on a special offer.
+*   **Method:** `POST`
+*   **URL:** `http://localhost:8080/vouchers/generate`
+*   **Query Parameters:**
+    *   `specialOfferName`: `Summer Sale`
+    *   `expirationDate`: `2026-12-31` (Use a future date in `YYYY-MM-DD` format)
+*   **Expected Response:** `200 OK` with an empty response body.
 
--   **URL**: `POST http://localhost:8080/vouchers/redeem`
--   **Body** (form-data):
-    -   `code`: `your-voucher-code`
-    -   `email`: `recipient@example.com`
+### Step 4: Get Valid Vouchers for a Recipient
 
-### Get Valid Vouchers for Recipient
+*   **Purpose:** To retrieve all valid (unredeemed and unexpired) vouchers for a specific recipient.
+*   **Method:** `GET`
+*   **URL:** `http://localhost:8080/vouchers/recipient/john.doe@example.com`
+*   **Optional Query Parameters (for pagination):**
+    *   `page`: `0`
+    *   `size`: `10`
+    *   `sort`: `expirationDate,desc`
+*   **Expected Response:** `200 OK` with a JSON array of `VoucherCode` objects. **Make sure to copy one of the `code` values from the response for the next step.**
 
--   **URL**: `GET http://localhost:8080/vouchers/recipient/test@example.com?page=0&size=10`
+### Step 5: Redeem a Voucher
 
-### Get Redeemed Vouchers for Offer
+*   **Purpose:** To mark a specific voucher code as redeemed for a recipient.
+*   **Method:** `POST`
+*   **URL:** `http://localhost:8080/vouchers/redeem`
+*   **Query Parameters:**
+    *   `code`: *[Paste the voucher code you copied from Step 4]*
+    *   `email`: `john.doe@example.com`
+*   **Expected Response:** `200 OK` with the updated `VoucherCode` object in the response body, showing `redeemed: true` and a `redeemedAt` timestamp.
 
--   **URL**: `GET http://localhost:8080/vouchers/offer/Black%20Friday%20Offer?page=0&size=10`
+### Step 6: Get Redeemed Vouchers for an Offer
+
+*   **Purpose:** To retrieve all redeemed vouchers associated with a specific special offer.
+*   **Method:** `GET`
+*   **URL:** `http://localhost:8080/vouchers/offer/Summer%20Sale`
+*   **Optional Query Parameters (for pagination):**
+    *   `page`: `0`
+    *   `size`: `10`
+    *   `sort`: `redeemedAt,desc`
+*   **Expected Response:** `200 OK` with a JSON array of `VoucherCode` objects that have been redeemed for the specified offer.
