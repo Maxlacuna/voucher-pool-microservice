@@ -35,7 +35,7 @@ public class VoucherService {
 
         if (specialOffer == null) {
             logger.error("Special offer not found: '{}'", specialOfferName);
-            return; // Or throw an exception
+            return;
         }
 
         List<Recipient> recipients = recipientRepository.findAll();
@@ -84,8 +84,6 @@ public class VoucherService {
     }
 
     private String generateUniqueCode() {
-        // A simple way to generate a unique code.
-        // In a real application, you would want a more robust solution.
         return UUID.randomUUID().toString().substring(0, 8);
     }
 }

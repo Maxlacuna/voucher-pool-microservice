@@ -26,8 +26,6 @@ public class RecipientController {
     }
     @DeleteMapping("/{email}")
     public ResponseEntity<Void> deleteRecipient(@PathVariable String email) {
-        // Note: This is not the most efficient way to do this, but it's simple for this example.
-        // A better approach would be to have a findByEmail method in the repository.
         recipientRepository.findAll().stream()
                 .filter(r -> r.getEmail().equals(email))
                 .findFirst()
